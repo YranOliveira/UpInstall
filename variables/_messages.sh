@@ -57,3 +57,109 @@ export WARN_LOW_DISK="Pouco espaço em disco disponível"
 export WARN_OLD_BACKUP="Backup antigo encontrado"
 export WARN_PM2_MEMORY="Alto uso de memória no PM2"
 export WARN_NGINX_LOAD="Alto número de conexões no Nginx"
+
+# Função para mostrar mensagem de sucesso com estilo
+success_message() {
+    local message=$1
+    printf "\n"
+    center_text "┌─────────────────── ✅ Sucesso ───────────────────┐" "${COLOR_GREEN}"
+    center_text "$message" "${COLOR_WHITE}"
+    center_text "└──────────────────────────────────────────────────┘" "${COLOR_GREEN}"
+    printf "\n"
+}
+
+# Função para mostrar mensagem de erro com estilo
+error_message() {
+    local message=$1
+    printf "\n"
+    center_text "┌──────────────────── ❌ Erro ────────────────────┐" "${COLOR_RED}"
+    center_text "$message" "${COLOR_WHITE}"
+    center_text "└─────────────────────────────────────────────────┘" "${COLOR_RED}"
+    printf "\n"
+}
+
+# Função para mostrar mensagem de aviso com estilo
+warning_message() {
+    local message=$1
+    printf "\n"
+    center_text "┌─────────────────── ⚠️ Aviso ───────────────────┐" "${COLOR_YELLOW}"
+    center_text "$message" "${COLOR_WHITE}"
+    center_text "└─────────────────────────────────────────────────┘" "${COLOR_YELLOW}"
+    printf "\n"
+}
+
+# Função para mostrar mensagem de informação com estilo
+info_message() {
+    local message=$1
+    printf "\n"
+    center_text "┌────────────────── ℹ️ Info ────────────────────┐" "${COLOR_BLUE}"
+    center_text "$message" "${COLOR_WHITE}"
+    center_text "└────────────────────────────────────────────────┘" "${COLOR_BLUE}"
+    printf "\n"
+}
+
+# Função para mostrar progresso
+show_progress() {
+    local current=$1
+    local total=$2
+    local width=50
+    local percentage=$((current * 100 / total))
+    local filled=$((width * current / total))
+    local empty=$((width - filled))
+    
+    printf "\r${COLOR_BLUE}["
+    printf "%${filled}s" | tr ' ' '█'
+    printf "%${empty}s" | tr ' ' '░'
+    printf "] ${percentage}%%${COLOR_NC}"
+}
+
+# Função para mostrar spinner de carregamento
+show_spinner() {
+    local message=$1
+    local pid=$2
+    local spin='-\|/'
+    local i=0
+    
+    while kill -0 $pid 2>/dev/null; do
+        i=$(( (i + 1) % 4 ))
+        printf "\r${COLOR_BLUE}${message} ${spin:$i:1}${COLOR_NC}"
+        sleep .1
+    done
+    printf "\r"
+}
+
+# Função para mostrar caixa de confirmação
+show_confirmation() {
+    local message=$1
+    printf "\n"
+    center_text "┌─────────────── Confirmação ───────────────┐" "${COLOR_YELLOW}"
+    center_text "$message" "${COLOR_WHITE}"
+    center_text "└────────────────────────────────────────────┘" "${COLOR_YELLOW}"
+    center_text "[S]im / [N]ão" "${COLOR_GREEN}"
+    printf "\n"
+    read -p "> " response
+    case "$response" in
+        [Ss]* ) return 0 ;;
+        * ) return 1 ;;
+    esac
+}
+
+# Função para mostrar caixa de entrada
+show_input() {
+    local message=$1
+    local default=$2
+    printf "\n"
+    center_text "┌─────────────── Entrada ───────────────┐" "${COLOR_BLUE}"
+    center_text "$message" "${COLOR_WHITE}"
+    if [ ! -z "$default" ]; then
+        center_text "(Padrão: $default)" "${COLOR_GRAY_LIGHT}"
+    fi
+    center_text "└────────────────────────────────────────┘" "${COLOR_BLUE}"
+    printf "\n"
+    read -p "> " response
+    if [ -z "$response" ] && [ ! -z "$default" ]; then
+        echo "$default"
+    else
+        echo "$response"
+    fi
+}

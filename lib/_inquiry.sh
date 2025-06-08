@@ -2,28 +2,22 @@
 
 get_mysql_root_password() {
     print_banner
-    printf "${COLOR_WHITE} 💻 Insira senha para o usuario Deploy e Banco de Dados (Não utilizar caracteres especiais):${COLOR_GRAY_LIGHT}"
-    printf "\n\n"
-    read -p "> " mysql_root_password
+    show_input "Digite a senha para o usuário Deploy e Banco de Dados" "deploy123"
 }
 
 get_link_git() {
     print_banner
-    printf "${COLOR_WHITE} 💻 Insira o link do Github da sua instalação que deseja instalar:${COLOR_GRAY_LIGHT}"
-    printf "\n\n"
-    read -p "> " link_git
+    show_input "Digite o link do Github da sua instalação"
 }
 
 get_instancia_add() {
     print_banner
-    printf "${COLOR_WHITE} 💻 Informe um nome para a Instancia/Empresa que será instalada${COLOR_GRAY_LIGHT}"
-    printf "\n${COLOR_YELLOW}(Não utilizar espaços ou caracteres especiais, Utilizar Letras minusculas)${COLOR_GRAY_LIGHT}"
-    printf "\n\n"
-    read -p "> " instancia_add
+    show_input "Digite o nome para a Instancia/Empresa" ""
+    local instancia_add=$response
 
     # Validar nome da instância
     if [[ ! $instancia_add =~ ^[a-z0-9][a-z0-9-]*[a-z0-9]$ ]]; then
-        print_error "Nome inválido! Use apenas letras minúsculas, números e hífen."
+        error_message "Nome inválido! Use apenas letras minúsculas, números e hífen."
         sleep 2
         get_instancia_add
         return
@@ -31,7 +25,7 @@ get_instancia_add() {
 
     # Verificar se já existe
     if [ -d "/home/deploy/empresas/$instancia_add" ]; then
-        print_error "Uma empresa com este nome já existe!"
+        error_message "Uma empresa com este nome já existe!"
         sleep 2
         get_instancia_add
         return
@@ -40,13 +34,12 @@ get_instancia_add() {
 
 get_max_whats() {
     print_banner
-    printf "${COLOR_WHITE} 💻 Informe a Qtde de Conexões/Whats que a ${COLOR_GREEN}${instancia_add}${COLOR_WHITE} poderá cadastrar:${COLOR_GRAY_LIGHT}"
-    printf "\n\n"
-    read -p "> " max_whats
+    show_input "Digite a quantidade de conexões WhatsApp para ${instancia_add}" "3"
+    local max_whats=$response
 
     # Validar número
     if ! [[ "$max_whats" =~ ^[0-9]+$ ]]; then
-        print_error "Por favor, insira apenas números!"
+        error_message "Por favor, insira apenas números!"
         sleep 2
         get_max_whats
         return
@@ -55,13 +48,12 @@ get_max_whats() {
 
 get_max_user() {
     print_banner
-    printf "${COLOR_WHITE} 💻 Informe a Qtde de Usuarios/Atendentes que a ${COLOR_GREEN}${instancia_add}${COLOR_WHITE} poderá cadastrar:${COLOR_GRAY_LIGHT}"
-    printf "\n\n"
-    read -p "> " max_user
+    show_input "Digite a quantidade de usuários/atendentes para ${instancia_add}" "3"
+    local max_user=$response
 
     # Validar número
     if ! [[ "$max_user" =~ ^[0-9]+$ ]]; then
-        print_error "Por favor, insira apenas números!"
+        error_message "Por favor, insira apenas números!"
         sleep 2
         get_max_user
         return
@@ -70,14 +62,12 @@ get_max_user() {
 
 get_frontend_url() {
     print_banner
-    printf "${COLOR_WHITE} 💻 Digite o domínio do FRONTEND/PAINEL para a ${COLOR_GREEN}${instancia_add}${COLOR_WHITE}:${COLOR_GRAY_LIGHT}"
-    printf "\n${COLOR_YELLOW}(Exemplo: painel.seudominio.com.br)${COLOR_GRAY_LIGHT}"
-    printf "\n\n"
-    read -p "> " frontend_url
+    show_input "Digite o domínio do FRONTEND/PAINEL para ${instancia_add}" "painel.seudominio.com.br"
+    local frontend_url=$response
 
-    # Validar domínio
-    if [[ ! $frontend_url =~ ^[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9]\.[a-zA-Z]{2,}$ ]]; then
-        print_error "Domínio inválido!"
+    # Validar domínio - expressão regular mais flexível
+    if [[ ! $frontend_url =~ ^[a-zA-Z0-9][a-zA-Z0-9.-]*[a-zA-Z0-9]\.[a-zA-Z.]{2,}$ ]]; then
+        error_message "Domínio inválido! Formato esperado: exemplo.dominio.com.br"
         sleep 2
         get_frontend_url
         return
@@ -86,14 +76,12 @@ get_frontend_url() {
 
 get_backend_url() {
     print_banner
-    printf "${COLOR_WHITE} 💻 Digite o domínio do BACKEND/API para a ${COLOR_GREEN}${instancia_add}${COLOR_WHITE}:${COLOR_GRAY_LIGHT}"
-    printf "\n${COLOR_YELLOW}(Exemplo: api.seudominio.com.br)${COLOR_GRAY_LIGHT}"
-    printf "\n\n"
-    read -p "> " backend_url
+    show_input "Digite o domínio do BACKEND/API para ${instancia_add}" "api.seudominio.com.br"
+    local backend_url=$response
 
-    # Validar domínio
-    if [[ ! $backend_url =~ ^[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9]\.[a-zA-Z]{2,}$ ]]; then
-        print_error "Domínio inválido!"
+    # Validar domínio - expressão regular mais flexível
+    if [[ ! $backend_url =~ ^[a-zA-Z0-9][a-zA-Z0-9.-]*[a-zA-Z0-9]\.[a-zA-Z.]{2,}$ ]]; then
+        error_message "Domínio inválido! Formato esperado: api.dominio.com.br"
         sleep 2
         get_backend_url
         return
@@ -102,14 +90,12 @@ get_backend_url() {
 
 get_frontend_port() {
     print_banner
-    printf "${COLOR_WHITE} 💻 Digite a porta do FRONTEND para a ${COLOR_GREEN}${instancia_add}${COLOR_WHITE}:${COLOR_GRAY_LIGHT}"
-    printf "\n${COLOR_YELLOW}(Utilize portas entre 3000 e 3999)${COLOR_GRAY_LIGHT}"
-    printf "\n\n"
-    read -p "> " frontend_port
+    show_input "Digite a porta do FRONTEND para ${instancia_add}" "3000"
+    local frontend_port=$response
 
     # Validar porta
     if ! [[ "$frontend_port" =~ ^[0-9]+$ ]] || [ "$frontend_port" -lt 3000 ] || [ "$frontend_port" -gt 3999 ]; then
-        print_error "Porta inválida! Use valores entre 3000 e 3999."
+        error_message "Porta inválida! Use valores entre 3000 e 3999."
         sleep 2
         get_frontend_port
         return
@@ -117,7 +103,7 @@ get_frontend_port() {
 
     # Verificar se a porta está em uso
     if netstat -tuln | grep -q ":$frontend_port "; then
-        print_error "Esta porta já está em uso!"
+        error_message "Esta porta já está em uso!"
         sleep 2
         get_frontend_port
         return
@@ -126,14 +112,12 @@ get_frontend_port() {
 
 get_backend_port() {
     print_banner
-    printf "${COLOR_WHITE} 💻 Digite a porta do BACKEND para a ${COLOR_GREEN}${instancia_add}${COLOR_WHITE}:${COLOR_GRAY_LIGHT}"
-    printf "\n${COLOR_YELLOW}(Utilize portas entre 4000 e 4999)${COLOR_GRAY_LIGHT}"
-    printf "\n\n"
-    read -p "> " backend_port
+    show_input "Digite a porta do BACKEND para ${instancia_add}" "4000"
+    local backend_port=$response
 
     # Validar porta
     if ! [[ "$backend_port" =~ ^[0-9]+$ ]] || [ "$backend_port" -lt 4000 ] || [ "$backend_port" -gt 4999 ]; then
-        print_error "Porta inválida! Use valores entre 4000 e 4999."
+        error_message "Porta inválida! Use valores entre 4000 e 4999."
         sleep 2
         get_backend_port
         return
@@ -141,7 +125,7 @@ get_backend_port() {
 
     # Verificar se a porta está em uso
     if netstat -tuln | grep -q ":$backend_port "; then
-        print_error "Esta porta já está em uso!"
+        error_message "Esta porta já está em uso!"
         sleep 2
         get_backend_port
         return
@@ -150,14 +134,12 @@ get_backend_port() {
 
 get_redis_port() {
     print_banner
-    printf "${COLOR_WHITE} 💻 Digite a porta do REDIS para a ${COLOR_GREEN}${instancia_add}${COLOR_WHITE}:${COLOR_GRAY_LIGHT}"
-    printf "\n${COLOR_YELLOW}(Utilize portas entre 5000 e 5999)${COLOR_GRAY_LIGHT}"
-    printf "\n\n"
-    read -p "> " redis_port
+    show_input "Digite a porta do REDIS para ${instancia_add}" "5000"
+    local redis_port=$response
 
     # Validar porta
     if ! [[ "$redis_port" =~ ^[0-9]+$ ]] || [ "$redis_port" -lt 5000 ] || [ "$redis_port" -gt 5999 ]; then
-        print_error "Porta inválida! Use valores entre 5000 e 5999."
+        error_message "Porta inválida! Use valores entre 5000 e 5999."
         sleep 2
         get_redis_port
         return
@@ -165,7 +147,7 @@ get_redis_port() {
 
     # Verificar se a porta está em uso
     if netstat -tuln | grep -q ":$redis_port "; then
-        print_error "Esta porta já está em uso!"
+        error_message "Esta porta já está em uso!"
         sleep 2
         get_redis_port
         return
@@ -299,33 +281,54 @@ inquiry_options() {
     read -p "> " option
 
     case "${option}" in
-        0) get_urls ;;
+        0) 
+            info_message "Iniciando instalação do sistema..."
+            get_urls 
+            ;;
         1) 
-            software_update 
+            if show_confirmation "Deseja atualizar o sistema?"; then
+                info_message "Iniciando atualização do sistema..."
+                software_update 
+            fi
             exit
             ;;
         2) 
-            software_delete 
+            if show_confirmation "Tem certeza que deseja remover o sistema?"; then
+                warning_message "Iniciando remoção do sistema..."
+                software_delete 
+            fi
             exit
             ;;
         3) 
-            software_bloquear 
+            if show_confirmation "Deseja bloquear o sistema?"; then
+                info_message "Bloqueando sistema..."
+                software_block 
+            fi
             exit
             ;;
         4) 
-            software_desbloquear 
+            if show_confirmation "Deseja desbloquear o sistema?"; then
+                info_message "Desbloqueando sistema..."
+                software_unblock 
+            fi
             exit
             ;;
         5) 
-            software_dominio 
+            if show_confirmation "Deseja alterar o domínio do sistema?"; then
+                info_message "Iniciando alteração de domínio..."
+                software_domain 
+            fi
             exit
             ;;    
         6) 
-            backup 
+            if show_confirmation "Deseja fazer backup do sistema?"; then
+                info_message "Iniciando backup do sistema..."
+                backup 
+            fi
             exit
             ;;            
         *) 
-            print_error "Opção inválida!"
+            error_message "Opção inválida!"
             sleep 2
             inquiry_options
             ;;
