@@ -6,12 +6,12 @@ Sistema de instalação automatizada do Whaticket SAAS com recursos avançados d
 
 ### 📥 Primeira Instalação
 ```bash
-sudo apt install -y git && git clone https://github.com/YranOliveira/UpInstall.git && cd instalandoprimeiravez && sudo chmod +x install_primaria && sudo ./install_primaria
+sudo apt install -y git && git clone https://github.com/YranOliveira/UpInstall.git && cd UpInstall && sudo chmod +x install_primaria && sudo ./install_primaria
 ```
 
 ### ➕ Instalações Adicionais
 ```bash
-cd /root/instalandoprimeiravez && sudo chmod +x install_primaria && sudo ./install_primaria
+cd /root/UpInstall && sudo chmod +x install_primaria && sudo ./install_primaria
 ```
 
 ## 📋 Requisitos do Sistema
